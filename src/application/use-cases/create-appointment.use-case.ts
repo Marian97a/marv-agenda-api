@@ -2,6 +2,7 @@
 import { randomUUID } from "node:crypto";
 import { Appointment } from "../../domain/appointment/appointment.entity";
 import { AppointmentRepository } from "../repositories/appointment.repository";
+import { AppointmentTimeConflictError } from "../errors/appointment-time-conflict.error";
 
 interface CreateAppointmentInput {
   clientName: string;
@@ -22,8 +23,8 @@ export class CreateAppointmentUseCase {
       );
 
     if (existingAppointment) {
-      throw new Error("Já existe um agendamento ativo neste horário.");
-    }
+  throw new AppointmentTimeConflictError();
+}
 
     const appointment = new Appointment({
       id: randomUUID(),
