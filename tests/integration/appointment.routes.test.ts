@@ -57,4 +57,76 @@ describe("Appointment Routes - Integration", () => {
     expect(secondResponse.status).toBe(409);
     expect(secondResponse.body.status).toBe("error");
   });
+  
+  it("deve listar os agendamentos", async () => {
+    const response = await request(app)
+      .get("/appointments");
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe("success");
+    expect(Array.isArray(response.body.data)).toBe(true);
+  });
+
+  it("deve consultar um agendamento pelo ID", async () => {
+    const created = await request(app)
+      .post("/appointments")
+      .send(createPayload());
+
+    const response = await request(app)
+      .get(`/appointments/${created.body.data.id}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.id).toBe(created.body.data.id);
+  });
+
+  it("deve retornar 404 para um agendamento inexistente", async () => {
+    const response = await request(app)
+      .get("/appointments/id-inexistente");
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe("Agendamento não encontrado.");
+  });
+
+  it("deve confirmar um agendamento", async () => {
+    const created = await request(app)
+      .post("/appointments")
+      .send(createPayload());
+
+    const response = await request(app)
+      .patch(`/appointments/${created.body.data.id}/confirm`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.status).toBe("CONFIRMED");
+  });
+
+  it("deve cancelar um agendamento", async () => {
+    const created = await request(app)
+      .post("/appointments")
+      .send(createPayload());
+
+    const response = await request(app)
+      .patch(`/appointments/${created.body.data.id}/cancel`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.status).toBe("CANCELLED");
+  });
+
+  it("não deve confirmar um agendamento cancelado", async () => {
+    const created = await request(app)
+      .post("/appointments")
+      .send(createPayload());
+
+    const id = created.body.data.id;
+
+    await request(app)
+      .patch(`/appointments/${id}/cancel`);
+
+    const response = await request(app)
+      .patch(`/appointments/${id}/confirm`);
+
+    expect(response.status).toBe(409);
+    expect(response.body.message).toBe(
+      "Não é possível confirmar um agendamento cancelado."
+    );
+  });
 });

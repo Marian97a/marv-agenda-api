@@ -1,7 +1,7 @@
+import { AppointmentRepository } from "../application/repositories/appointment.repository";
+import { AppointmentStatus } from "../domain/appointment/appointment-status";
+import { Appointment } from "../domain/appointment/appointment.entity";
 
-import { Appointment } from "../../domain/appointment/appointment.entity";
-import { AppointmentStatus } from "../../domain/appointment/appointment-status";
-import { AppointmentRepository } from "../../application/repositories/appointment.repository";
 
 export class InMemoryAppointmentRepository implements AppointmentRepository {
   private appointments: Appointment[] = [];
@@ -18,6 +18,18 @@ export class InMemoryAppointmentRepository implements AppointmentRepository {
     });
 
     return appointment ?? null;
+  }
+
+  async findById(id: string): Promise<Appointment | null> {
+    const appointment = this.appointments.find(
+      (item) => item.id === id
+    );
+
+    return appointment ?? null;
+  }
+
+  async findAll(): Promise<Appointment[]> {
+    return [...this.appointments];
   }
 
   async save(appointment: Appointment): Promise<void> {
