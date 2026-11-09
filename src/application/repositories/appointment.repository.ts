@@ -1,4 +1,3 @@
-
 import { Appointment } from "../../domain/appointment/appointment.entity";
 
 export interface AppointmentRepository {
@@ -9,4 +8,6 @@ export interface AppointmentRepository {
   findAll(): Promise<Appointment[]>;
 
   save(appointment: Appointment): Promise<void>;
+
+  update(appointment: Appointment): Promise<void>;
 }

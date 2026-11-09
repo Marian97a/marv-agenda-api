@@ -18,6 +18,8 @@ export class ConfirmAppointmentUseCase {
 
     appointment.confirm();
 
+    await this.appointmentRepository.update(appointment);
+
     return appointment;
   }
 }

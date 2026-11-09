@@ -35,4 +35,16 @@ export class InMemoryAppointmentRepository implements AppointmentRepository {
   async save(appointment: Appointment): Promise<void> {
     this.appointments.push(appointment);
   }
+
+  async update(appointment: Appointment): Promise<void> {
+  const index = this.appointments.findIndex(
+    (item) => item.id === appointment.id
+  );
+
+  if (index === -1) {
+    throw new Error("Agendamento não encontrado para atualização.");
+  }
+
+  this.appointments[index] = appointment;
+}
 }

@@ -18,6 +18,8 @@ export class CancelAppointmentUseCase {
 
     appointment.cancel();
 
+    await this.appointmentRepository.update(appointment);
+
     return appointment;
   }
 }
