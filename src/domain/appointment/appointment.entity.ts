@@ -1,4 +1,3 @@
-
 import { AppointmentStatus } from "./appointment-status";
 
 interface CreateAppointmentData {
@@ -7,6 +6,7 @@ interface CreateAppointmentData {
   phone: string;
   service: string;
   dateTime: Date;
+  createdAt?: Date;
 }
 
 export class Appointment {
@@ -32,8 +32,10 @@ export class Appointment {
       throw new Error("O serviço é obrigatório.");
     }
 
-    if (!(data.dateTime instanceof Date) ||
-        Number.isNaN(data.dateTime.getTime())) {
+    if (
+      !(data.dateTime instanceof Date) ||
+      Number.isNaN(data.dateTime.getTime())
+    ) {
       throw new Error("A data do agendamento é inválida.");
     }
 
@@ -42,7 +44,7 @@ export class Appointment {
     this.phone = data.phone.trim();
     this.service = data.service.trim();
     this.dateTime = data.dateTime;
-    this.createdAt = new Date();
+    this.createdAt = data.createdAt ?? new Date();
     this.status = AppointmentStatus.PENDING;
   }
 
@@ -52,9 +54,7 @@ export class Appointment {
 
   public confirm(): void {
     if (this.status === AppointmentStatus.CANCELLED) {
-      throw new Error(
-        "Não é possível confirmar um agendamento cancelado."
-      );
+      throw new Error("Não é possível confirmar um agendamento cancelado.");
     }
 
     this.status = AppointmentStatus.CONFIRMED;
@@ -62,11 +62,38 @@ export class Appointment {
 
   public cancel(): void {
     if (this.status === AppointmentStatus.CANCELLED) {
-      throw new Error(
-        "Este agendamento já está cancelado."
-      );
+      throw new Error("Este agendamento já está cancelado.");
     }
 
     this.status = AppointmentStatus.CANCELLED;
   }
+
+public static restore(data: {
+  id: string;
+  clientName: string;
+  phone: string;
+  service: string;
+  dateTime: Date;
+  createdAt: Date;
+  status: AppointmentStatus;
+}): Appointment {
+  const appointment = new Appointment({
+    id: data.id,
+    clientName: data.clientName,
+    phone: data.phone,
+    service: data.service,
+    dateTime: data.dateTime,
+    createdAt: data.createdAt
+  });
+
+  if (data.status === AppointmentStatus.CONFIRMED) {
+    appointment.confirm();
+  }
+
+  if (data.status === AppointmentStatus.CANCELLED) {
+    appointment.cancel();
+  }
+
+  return appointment;
+}
 }

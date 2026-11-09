@@ -1,6 +1,6 @@
-import { AppointmentRepository } from "../application/repositories/appointment.repository";
-import { AppointmentStatus } from "../domain/appointment/appointment-status";
-import { Appointment } from "../domain/appointment/appointment.entity";
+import { AppointmentRepository } from "../../application/repositories/appointment.repository";
+import { AppointmentStatus } from "../../domain/appointment/appointment-status";
+import { Appointment } from "../../domain/appointment/appointment.entity";
 
 
 export class InMemoryAppointmentRepository implements AppointmentRepository {

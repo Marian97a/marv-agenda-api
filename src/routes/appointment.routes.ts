@@ -9,7 +9,7 @@ import { CancelAppointmentUseCase } from "../application/use-cases/cancel-appoin
 
 import { AppointmentTimeConflictError } from "../application/errors/appointment-time-conflict.error";
 import { AppointmentNotFoundError } from "../application/errors/appointment-not-found.error";
-import { InMemoryAppointmentRepository } from "../infrastructure/in-memory-appointment.repository";
+import { InMemoryAppointmentRepository } from "../infrastructure/repositories/in-memory-appointment.repository";
 
 
 const router = Router();
