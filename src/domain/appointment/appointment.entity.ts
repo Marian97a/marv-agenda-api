@@ -1,4 +1,5 @@
 import { AppointmentStatus } from "./appointment-status";
+import { InvalidAppointmentStateError } from "./invalid-appointment-state.error";
 
 interface CreateAppointmentData {
   id: string;
@@ -52,21 +53,27 @@ export class Appointment {
     return this.status;
   }
 
-  public confirm(): void {
-    if (this.status === AppointmentStatus.CANCELLED) {
-      throw new Error("Não é possível confirmar um agendamento cancelado.");
-    }
-
-    this.status = AppointmentStatus.CONFIRMED;
+  
+public confirm(): void {
+  if (this.status === AppointmentStatus.CANCELLED) {
+    throw new InvalidAppointmentStateError(
+      "Não é possível confirmar um agendamento cancelado."
+    );
   }
 
-  public cancel(): void {
-    if (this.status === AppointmentStatus.CANCELLED) {
-      throw new Error("Este agendamento já está cancelado.");
-    }
+  this.status = AppointmentStatus.CONFIRMED;
+}
 
-    this.status = AppointmentStatus.CANCELLED;
+public cancel(): void {
+  if (this.status === AppointmentStatus.CANCELLED) {
+    throw new InvalidAppointmentStateError(
+      "Este agendamento já está cancelado."
+    );
   }
+
+  this.status = AppointmentStatus.CANCELLED;
+}
+
 
 public static restore(data: {
   id: string;

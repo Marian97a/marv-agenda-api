@@ -1,4 +1,3 @@
-
 import { describe, expect, it } from "vitest";
 import { Appointment } from "../../src/domain/appointment/appointment.entity";
 import { AppointmentStatus } from "../../src/domain/appointment/appointment-status";
@@ -24,6 +23,24 @@ class InMemoryAppointmentRepository implements AppointmentRepository {
 
   async save(appointment: Appointment): Promise<void> {
     this.appointments.push(appointment);
+  }
+
+  // Métodos adicionados para satisfazer o contrato da interface no teste:
+
+  async findById(id: string): Promise<Appointment | null> {
+    const appointment = this.appointments.find((item) => item.id === id);
+    return appointment ?? null;
+  }
+
+  async findAll(): Promise<Appointment[]> {
+    return this.appointments;
+  }
+
+  async update(appointment: Appointment): Promise<void> {
+    const index = this.appointments.findIndex((item) => item.id === appointment.id);
+    if (index !== -1) {
+      this.appointments[index] = appointment;
+    }
   }
 }
 
