@@ -1,7 +1,10 @@
-
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import request from "supertest";
-import app from "../../src/app";
+
+import { createApp } from "../../src/app";
+import { InMemoryAppointmentRepository } from "../../src/infrastructure/repositories/in-memory-appointment.repository";
+
+let app: ReturnType<typeof createApp>;
 
 function createPayload() {
   return {
@@ -11,6 +14,11 @@ function createPayload() {
     dateTime: new Date(Date.now() + 86400000).toISOString()
   };
 }
+
+beforeEach(() => {
+  const repository = new InMemoryAppointmentRepository();
+  app = createApp(repository);
+});
 
 describe("Appointment Routes - Integration", () => {
   it("deve criar um agendamento e retornar HTTP 201", async () => {
@@ -57,7 +65,7 @@ describe("Appointment Routes - Integration", () => {
     expect(secondResponse.status).toBe(409);
     expect(secondResponse.body.status).toBe("error");
   });
-  
+
   it("deve listar os agendamentos", async () => {
     const response = await request(app)
       .get("/appointments");
