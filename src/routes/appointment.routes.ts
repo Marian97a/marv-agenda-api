@@ -150,8 +150,8 @@ export function createAppointmentRouter(appointmentRepository: AppointmentReposi
         status: "error",
         message: "Erro interno ao confirmar agendamento."
       });
-    } // <- Faltava esse fechamento da rota
-  }); // <- Faltava esse fechamento do router.patch
+    } 
+  }); 
 
   // PATCH /appointments/:id/cancel
   router.patch("/:id/cancel", async (req, res) => {
