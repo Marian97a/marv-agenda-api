@@ -7,6 +7,7 @@ import { CreateAppointmentUseCase } from "../application/use-cases/create-appoin
 import { GetAppointmentByIdUseCase } from "../application/use-cases/get-appointment-by-id.use-case";
 import { ListAppointmentsUseCase } from "../application/use-cases/list-appointments.use-case";
 import { AppointmentRepository } from "../application/repositories/appointment.repository";
+import { InvalidAppointmentStateError } from "../domain/appointment/invalid-appointment-state.error";
 
 // Esta é a função que o app.ts vai chamar!
 export function createAppointmentRouter(appointmentRepository: AppointmentRepository) {
@@ -92,34 +93,33 @@ export function createAppointmentRouter(appointmentRepository: AppointmentReposi
     }
   });
 
-// GET /appointments/:id
-router.get("/:id", async (req, res) => {
-  try {
-    const appointment = await getAppointmentByIdUseCase.execute(req.params.id);
+  // GET /appointments/:id
+  router.get("/:id", async (req, res) => {
+    try {
+      const appointment = await getAppointmentByIdUseCase.execute(req.params.id);
 
-    return res.status(200).json({
-      status: "success",
-      data: appointment
-    });
-  } catch (error: any) {
-    if (
-      error instanceof AppointmentNotFoundError ||
-      error.code === "22P02" ||
-      error.message?.includes("invalid input syntax for type uuid")
-    ) {
-      return res.status(404).json({
+      return res.status(200).json({
+        status: "success",
+        data: appointment
+      });
+    } catch (error: any) {
+      if (
+        error instanceof AppointmentNotFoundError ||
+        error.code === "22P02" ||
+        error.message?.includes("invalid input syntax for type uuid")
+      ) {
+        return res.status(404).json({
+          status: "error",
+          message: "Agendamento não encontrado."
+        });
+      }
+
+      return res.status(500).json({
         status: "error",
-        message: "Agendamento não encontrado."
+        message: "Erro interno ao consultar agendamento."
       });
     }
-
-    return res.status(500).json({
-      status: "error",
-      message: "Erro interno ao consultar agendamento."
-    });
-  }
-});
-
+  });
 
   // PATCH /appointments/:id/confirm
   router.patch("/:id/confirm", async (req, res) => {
@@ -139,7 +139,7 @@ router.get("/:id", async (req, res) => {
         });
       }
 
-      if (error instanceof Error) {
+      if (error instanceof InvalidAppointmentStateError) {
         return res.status(409).json({
           status: "error",
           message: error.message
@@ -150,8 +150,8 @@ router.get("/:id", async (req, res) => {
         status: "error",
         message: "Erro interno ao confirmar agendamento."
       });
-    }
-  });
+    } // <- Faltava esse fechamento da rota
+  }); // <- Faltava esse fechamento do router.patch
 
   // PATCH /appointments/:id/cancel
   router.patch("/:id/cancel", async (req, res) => {
@@ -171,7 +171,7 @@ router.get("/:id", async (req, res) => {
         });
       }
 
-      if (error instanceof Error) {
+      if (error instanceof InvalidAppointmentStateError) {
         return res.status(409).json({
           status: "error",
           message: error.message

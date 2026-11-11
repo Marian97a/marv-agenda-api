@@ -1,0 +1,219 @@
+
+openapi: 3.0.3
+
+info:
+  title: MARV Agenda API
+  description: API REST para gerenciamento de agendamentos.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Ambiente local
+
+tags:
+  - name: Health
+    description: Verificação da saúde da API
+  - name: Appointments
+    description: Gerenciamento de agendamentos
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Verifica a disponibilidade da API
+      responses:
+        "200":
+          description: API disponível
+
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Cria um novo agendamento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointment"
+            example:
+              clientName: João Silva
+              phone: "85999999999"
+              service: Consulta inicial
+              dateTime: "2026-11-15T14:00:00.000Z"
+      responses:
+        "201":
+          description: Agendamento criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "400":
+          description: Dados inválidos
+        "409":
+          description: Já existe agendamento ativo nesse horário
+        "500":
+          description: Erro interno
+
+    get:
+      tags:
+        - Appointments
+      summary: Lista todos os agendamentos
+      responses:
+        "200":
+          description: Lista de agendamentos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Appointment"
+        "500":
+          description: Erro interno
+
+  /appointments/{id}:
+    get:
+      tags:
+        - Appointments
+      summary: Consulta um agendamento pelo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID do agendamento
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Agendamento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "404":
+          description: Agendamento não encontrado
+        "500":
+          description: Erro interno
+
+  /appointments/{id}/confirm:
+    patch:
+      tags:
+        - Appointments
+      summary: Confirma um agendamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID do agendamento
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Agendamento confirmado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "404":
+          description: Agendamento não encontrado
+        "409":
+          description: Operação não permitida
+        "500":
+          description: Erro interno
+
+  /appointments/{id}/cancel:
+    patch:
+      tags:
+        - Appointments
+      summary: Cancela um agendamento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: UUID do agendamento
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Agendamento cancelado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppointmentResponse"
+        "404":
+          description: Agendamento não encontrado
+        "409":
+          description: Operação não permitida
+        "500":
+          description: Erro interno
+
+components:
+  schemas:
+    CreateAppointment:
+      type: object
+      required:
+        - clientName
+        - phone
+        - service
+        - dateTime
+      properties:
+        clientName:
+          type: string
+          example: João Silva
+        phone:
+          type: string
+          example: "85999999999"
+        service:
+          type: string
+          example: Consulta inicial
+        dateTime:
+          type: string
+          format: date-time
+          example: "2026-11-15T14:00:00.000Z"
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+        phone:
+          type: string
+        service:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+            - CANCELLED
+
+    AppointmentResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Operação realizada com sucesso.
+        data:
+          $ref: "#/components/schemas/Appointment"

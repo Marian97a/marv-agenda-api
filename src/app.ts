@@ -1,9 +1,21 @@
+
 import express from "express";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import swaggerUi from "swagger-ui-express";
+import { parse } from "yaml";
 
 import healthRoutes from "./routes/health.routes";
 import { createAppointmentRouter } from "./routes/appointment.routes";
 import { AppointmentRepository } from "./application/repositories/appointment.repository";
 import { PostgresAppointmentRepository } from "./infrastructure/repositories/postgres-appointment.repository";
+
+const openApiFile = readFileSync(
+  join(process.cwd(), "docs", "openapi.yaml"),
+  "utf-8"
+);
+
+const openApiDocument = parse(openApiFile);
 
 export function createApp(repository: AppointmentRepository) {
   const app = express();
@@ -12,12 +24,14 @@ export function createApp(repository: AppointmentRepository) {
 
   app.use("/health", healthRoutes);
 
-  // Aqui passamos o repositório injetado
   app.use("/appointments", createAppointmentRouter(repository));
+
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
   return app;
 }
 
 const realRepository = new PostgresAppointmentRepository();
 const app = createApp(realRepository);
+
 export default app;
