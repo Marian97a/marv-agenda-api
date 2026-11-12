@@ -2,7 +2,9 @@
 
 [![CI](https://github.com/Marian97a/marv-agenda-api/actions/workflows/ci.yml/badge.svg)](https://github.com/Marian97a/marv-agenda-api/actions/workflows/ci.yml)
 
-API REST para gerenciamento de agendamentos, desenvolvida como projeto final da trilha Full Cycle do programa Geração Tech 26 — Ceará, permitindo operações completas de CRUD via Node.js, TypeScript e PostgreSQL.
+API REST para gerenciamento de agendamentos, desenvolvida como projeto final da trilha Full Cycle do programa Geração Tech 26 — Ceará.
+
+Permite cadastrar, consultar, confirmar e cancelar agendamentos utilizando Node.js, TypeScript e PostgreSQL.
 
 ## Nível do projeto
 
@@ -65,7 +67,11 @@ Utiliza arquitetura em camadas, separação de responsabilidades, padrão Reposi
    ```
    Acesse a API em `http://localhost:3000`. Para parar os serviços sem perder dados: `docker compose down` (ou reinicie com `docker compose up -d`).
 
-   *(Opcional) Para rodar apenas o banco no Docker e a API localmente via hot-reloading: `docker compose up -d db` seguido de `npm run dev`*.
+   *(Opcional) Para rodar apenas o banco no Docker e a API localmente via hot-reloading:*
+   ```bash
+   docker compose up -d postgres
+   npm run dev
+   ```
 
 ## Endpoints e Documentação
 
