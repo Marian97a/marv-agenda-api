@@ -12,16 +12,22 @@ import { AppointmentRepository } from "./application/repositories/appointment.re
 import { PostgresAppointmentRepository } from "./infrastructure/repositories/postgres-appointment.repository";
 import { logger } from "./infrastructure/observability/logger";
 import { httpMetricsMiddleware } from "./infrastructure/observability/metrics";
+import cors from "cors";
 
 const openApiFile = readFileSync(
   join(process.cwd(), "docs", "openapi.yaml"),
-  "utf-8"
+  "utf-8",
 );
 
 const openApiDocument = parse(openApiFile);
 
 export function createApp(repository: AppointmentRepository) {
   const app = express();
+  app.use(
+    cors({
+      origin: "http://localhost:5173",
+    }),
+  );
 
   app.use(pinoHttp({ logger }));
   app.use(express.json());
