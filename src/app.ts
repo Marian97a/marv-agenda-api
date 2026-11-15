@@ -24,10 +24,13 @@ const openApiDocument = parse(openApiFile);
 export function createApp(repository: AppointmentRepository) {
   const app = express();
   app.use(
-    cors({
-      origin: "http://localhost:5173",
-    }),
-  );
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://marv-agenda-web.onrender.com",
+    ],
+  })
+);
 
   app.use(pinoHttp({ logger }));
   app.use(express.json());
